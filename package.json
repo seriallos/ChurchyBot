@@ -28,7 +28,8 @@
     "hubot-slack": "^3.3.0",
     "hubot-thank-you": "0.0.3",
     "hubot-youtube": "^1.0.1",
-    "request": "^2.64.0"
+    "request": "^2.64.0",
+    "ws": "^0.8.0"
   },
   "engines": {
     "node": "0.10.x"
