@@ -26,7 +26,7 @@ USERS_TO_TRACK = [
     'apparentbliss',
     'octopanic',
     'beefhammer',
-    'Agi'
+    'agi'
 ];
 
 #{ username: '0xF86B5A89',
