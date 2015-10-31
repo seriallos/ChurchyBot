@@ -19,6 +19,16 @@ activeGames = {}
 firstMsg = true
 deathLookupWaitSeconds = 30
 
+USERS_TO_TRACK = [
+    'sollaires',
+    'drukna',
+    'sieger',
+    'apparentbliss',
+    'octopanic',
+    'beefhammer',
+    'Agi'
+];
+
 #{ username: '0xF86B5A89',
 #  xl: '18',
 #  title: 'Devastator',
@@ -96,7 +106,7 @@ module.exports = (robot) ->
       if firstMsg
         firstMsg = false
         return
-      users = ['sollaires','drukna','sieger','apparentbliss','octopanic','beefhammer'];
+      users = USERS_TO_TRACK
       if DEBUG
         users.push 'sollairestest'
       msgLen = data.msgs.length;
