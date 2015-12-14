@@ -28,7 +28,9 @@
     "hubot-slack": "^3.3.0",
     "hubot-thank-you": "0.0.3",
     "hubot-youtube": "^1.0.1",
+    "lodash": "^3.10.1",
     "request": "^2.64.0",
+    "steam-webapi": "^0.6.5",
     "ws": "^0.8.0"
   },
   "engines": {
