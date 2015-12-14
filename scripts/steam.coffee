@@ -23,8 +23,12 @@ module.exports = (robot) ->
         appLookup = _.indexBy data.applist.apps, (obj) ->
           if obj.name
             return obj.name.toLowerCase()
-        console.log appLookup.length, "apps indexed"
 
         robot.respond /steam appid (.*)/i, (msg) ->
-          msg.send appLookup[msg.match[1].toLowerCase()].appid
+          game = msg.match[1]
+          console.log "Looking up AppID for ", game
+          if appLookup[game.toLowerCase()]
+            msg.send appLookup[game.toLowerCase()].appid
+          else
+            msg.send "Cannot find that game"
 
