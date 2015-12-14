@@ -11,14 +11,14 @@ Steam.key = process.env.STEAM_API_KEY
 appLookup = {}
 
 module.exports = (robot) ->
-  Steam.ready (err) ->
-    if err
-      console.error err
+  Steam.ready (steamReadyErr) ->
+    if steamReadyErr
+      console.error steamReadyErr
     else
       console.log "Steam ready"
       steam = new Steam()
 
-      steam.getAppList {}, (err, data) ->
+      steam.getAppList {}, (appListErr, data) ->
         console.log "Got app list, num apps found: ", data.applist.apps.length
         appLookup = _.indexBy data.applist.apps, (obj) ->
           if obj.name
@@ -28,7 +28,7 @@ module.exports = (robot) ->
           game = msg.match[1]
           console.log "Looking up AppID for ", game
           if appLookup[game.toLowerCase()]
-            msg.send appLookup[game.toLowerCase()].appid
+            msg.send String(appLookup[game.toLowerCase()].appid)
           else
             msg.send "Cannot find that game"
 
