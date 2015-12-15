@@ -126,7 +126,6 @@ getUserStatsForGame = (steam, userId, appId, cb) ->
         console.error 'getUserStatsForGame error', err
         cb err
     else
-      console.log data
       cb null, data
 
 getUserId = (steam, name, cb) ->
