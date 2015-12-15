@@ -61,8 +61,14 @@ module.exports = (robot) ->
             ],
             player: ['userId', (cb, results) ->
               getPlayerSummary steam, results.userId, cb
-            ]
+            ],
+            games: ['userId', (cb, results) ->
+              getOwnedGames steam, results.userId, null, cb
+            ],
           }, (err, results) ->
+
+            console.log results
+
             name = results.player.personaname
             url = results.player.profileurl
             avatar = results.player.avatarmedium
@@ -76,11 +82,14 @@ module.exports = (robot) ->
                 color: '#345678'
                 title: name
                 title_link: url
-                text: "Level #{level}"
-                image_url: avatar
+                thumb_url: avatar
                 fields: [{
                   title: 'Level'
                   value: level
+                  short: true
+                }, {
+                  title: 'Games Owned'
+                  value: Object.keys(results.games).length
                   short: true
                 }, {
                   title: 'Last Online'
