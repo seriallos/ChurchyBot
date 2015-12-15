@@ -70,6 +70,8 @@ module.exports = (robot) ->
 
             text = "#{name}, Level #{level}, #{url}"
             robot.emit 'slack-attachment', {
+              channel: msg.envelope.room
+              username: msg.robot.name
               attachments: [{
                 color: '#345678'
                 title: name
