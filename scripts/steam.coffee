@@ -100,6 +100,7 @@ getOwnedGames = (steam, userId, appId, cb) ->
     appids_filter: null
   steam.getOwnedGames opts, (err, data) ->
     if err
+      console.error 'getOwnedGames error', err
       cb err
     else
       cb null, _.indexBy(data.games, 'appid')
@@ -110,6 +111,7 @@ getSchemaForGame = (steam, appId, cb) ->
       if err.message.match /HTTP 400/
         cb Error("Game not found"), null
       else
+        console.error 'getSchemaForGame error', err
         cb err
     else
       cb null, data
@@ -121,6 +123,7 @@ getUserStatsForGame = (steam, userId, appId, cb) ->
         # return empty stats
         cb null, null
       else
+        console.error 'getUserStatsForGame error', err
         cb err
     else
       cb null, data
@@ -128,6 +131,7 @@ getUserStatsForGame = (steam, userId, appId, cb) ->
 getUserId = (steam, name, cb) ->
   steam.resolveVanityURL {vanityurl: name}, (err, data) ->
     if err
+      console.error 'getUserId error', err
       cb err
     else
       if data.message == 'No match'
