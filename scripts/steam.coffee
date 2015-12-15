@@ -50,7 +50,7 @@ module.exports = (robot) ->
             else
               msg.send userId ? "User not found"
 
-        robot.respond /steam achievements (.*) (.*)/i, (msg) ->
+        robot.respond /steam stats (.*) (.*)/i, (msg) ->
           appName = msg.match[1]
           userName = msg.match[2]
           console.log "Looking up stats for game ", appName, ", user ", userName
