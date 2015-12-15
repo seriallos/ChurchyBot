@@ -91,14 +91,14 @@ module.exports = (robot) ->
                   title: 'Games Owned'
                   value: Object.keys(results.games).length
                   short: true
-                }, {
-                  title: 'Last Online'
-                  value: results.player.lastlogoff
-                  short: true
-                }, {
-                  title: 'Created'
-                  value: results.player.timecreated
-                  short: true
+                #}, {
+                #  title: 'Last Online'
+                #  value: results.player.lastlogoff
+                #  short: true
+                #}, {
+                #  title: 'Created'
+                #  value: results.player.timecreated
+                #  short: true
                 }]
               }]
             }
@@ -168,7 +168,7 @@ getPlaytime = (steam, userId, appId, cb) ->
 getOwnedGames = (steam, userId, appId, cb) ->
   opts =
     steamid: userId
-    include_appinfo: true
+    include_appinfo: false
     include_played_free_games: true
     appids_filter: null
   steam.getOwnedGames opts, (err, data) ->
