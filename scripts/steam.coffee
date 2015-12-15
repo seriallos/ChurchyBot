@@ -46,7 +46,7 @@ module.exports = (robot) ->
           console.log "Looking up userId for ", msg.match[1]
           getUserId steam, msg.match[1], (err, userId) ->
             if err
-              msg.send err
+              msg.send String(err)
             else
               msg.send String(userId) ? "User not found"
 
