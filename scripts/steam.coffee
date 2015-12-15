@@ -137,6 +137,7 @@ getUserId = (steam, name, cb) ->
       if data.message == 'No match'
         cb Error("No such user")
       else
+        console.log data
         cb null, data.steamid
 
 getGameId = (name) ->
