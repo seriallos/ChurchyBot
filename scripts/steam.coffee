@@ -1,4 +1,5 @@
 Steam = require 'steam-webapi'
+async = require 'async'
 _ = require 'lodash'
 
 
@@ -40,6 +41,27 @@ module.exports = (robot) ->
               msg.send err
             else
               msg.send userId ? "User not found"
+
+        robot.respond /steam stats (.*) (.*)/i, (msg) ->
+          appName = msg.match[1]
+          userName = msg.match[2]
+          console.log "Looking up stats for game ", appName, ", user ", userName
+          appId = getGameId(appName)
+          async.auto({
+            userId: (cb, results) -> getUserId(steam, userName, cb)
+            schema: (cb, results) ->
+              steam.getSchemaForGame {appid: appId}, cb
+            stats: ['userId', (cb, results) ->
+              steam.getUserStatsForGame {steamid: results.userId, appid: appId, version: 2}, cb
+            ]
+          }, (err, results) ->
+            if err
+              msg.send err
+            else
+              numGameCheevos = results.schema.game.availableGameStats.achievements.length
+              numUserCheevos = results.stats.playerstats.achievements.length
+              msg.send "Achievements: #{numUserCheevos} / #{numGameCheevos}"
+          )
 
 getUserId = (steam, name, cb) ->
   steam.resolveVanityURL {vanityurl: name}, (err, data) ->
