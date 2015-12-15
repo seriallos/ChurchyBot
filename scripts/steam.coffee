@@ -50,7 +50,7 @@ module.exports = (robot) ->
           async.auto({
             userId: (cb, results) -> getUserId(steam, userName, cb)
             schema: (cb, results) ->
-              steam.getSchemaForGame {appid: appId}, cb
+              getSchemaForGame steam, appId, cb
             stats: ['userId', (cb, results) ->
               getUserStatsForGame steam, results.userId, appId, cb
             ]
@@ -63,10 +63,23 @@ module.exports = (robot) ->
               msg.send "Achievements: #{numUserCheevos} / #{numGameCheevos}"
           )
 
+
+
+getSchemaForGame = (steam, appId, cb) ->
+  steam.getSchemaForGame {appid: appId}, (err, data) ->
+    if err
+      if err.message.match /HTTP 400/
+        cb Error("Game not found"), null
+      else
+        cb err
+    else
+      cb null, data
+
 getUserStatsForGame = (steam, userId, appId, cb) ->
   steam.getUserStatsForGame {steamid: userId, appid: appId, version: 2}, (err, data) ->
     if err
       if err.message.match /HTTP 400/
+        # return empty stats
         cb null, null
       else
         cb err
