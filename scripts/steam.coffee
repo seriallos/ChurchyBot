@@ -1,3 +1,11 @@
+# Description:
+#   DCSS Bot Stuff
+#
+# Commands:
+#   hubot steam achievements <game> <username> - Game stats for a user
+#   hubot steam userid <username> - Get user's Steam ID based on vanity URL
+#   hubot steam appid <game> - Get a game's AppId (loaded at startup)
+
 Steam = require 'steam-webapi'
 async = require 'async'
 _ = require 'lodash'
@@ -42,7 +50,7 @@ module.exports = (robot) ->
             else
               msg.send userId ? "User not found"
 
-        robot.respond /steam stats (.*) (.*)/i, (msg) ->
+        robot.respond /steam achievements (.*) (.*)/i, (msg) ->
           appName = msg.match[1]
           userName = msg.match[2]
           console.log "Looking up stats for game ", appName, ", user ", userName
