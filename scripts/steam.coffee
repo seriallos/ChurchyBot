@@ -22,6 +22,7 @@ appLookup = {}
 module.exports = (robot) ->
   Steam.ready (steamReadyErr) ->
     if steamReadyErr
+      console.error "Steam.ready failed!"
       console.error steamReadyErr
     else
       console.log "Steam ready"
@@ -50,6 +51,30 @@ module.exports = (robot) ->
             else
               msg.send String(userId) ? "User not found"
 
+        robot.respond /steam player (.*)/i, (msg) ->
+          username = msg.match[1]
+          console.log "Looking up player summary for #{username}"
+          async.auto({
+            userId: (cb, results) -> getUserId(steam, username, cb),
+            level: ['userId', (cb, results) ->
+              getSteamLevel steam, results.userId, cb
+            ],
+            player: ['userId', (cb, results) ->
+              getPlayerSummary steam, results.userId, cb
+            ]
+          }, (err, results) ->
+            console.log err
+            console.log results
+
+            name = results.player.personaname
+            url = results.player.profileurl
+            avatar = results.player.avatar
+            level = results.level
+
+            msg.send "#{name}, Level #{level}, #{url}"
+
+          )
+
         robot.respond /steam stats (.*) (.*)/i, (msg) ->
           appName = msg.match[1]
           userName = msg.match[2]
@@ -74,8 +99,26 @@ module.exports = (robot) ->
               numGameCheevos = results?.schema?.game?.availableGameStats?.achievements?.length ? 0
               numUserCheevos = results?.stats?.playerstats?.achievements?.length ? 0
 
-              msg.send "Playtime: #{results.playtime}, Achievements: #{numUserCheevos} / #{numGameCheevos}"
+              out = ["Playtime: #{results.playtime}"]
+              if numGameCheevos
+                out.push("Achievements: #{numUserCheevos} / #{numGameCheevos}")
+
+              msg.send out.join(', ')
           )
+
+getSteamLevel = (steam, userId, cb) ->
+  steam.getSteamLevel {steamid: userId}, (err, data) ->
+    if err
+      cb err
+    else
+      cb null, data.player_level
+
+getPlayerSummary = (steam, userId, cb) ->
+  steam.getPlayerSummaries {steamids: userId}, (err, data) ->
+    if err
+      cb err
+    else
+      cb null, data.players.shift()
 
 getPlaytime = (steam, userId, appId, cb) ->
   getOwnedGames steam, userId, appId, (err, owned) ->
@@ -124,6 +167,7 @@ getUserStatsForGame = (steam, userId, appId, cb) ->
         cb null, null
       else
         console.error 'getUserStatsForGame error', err
+        console.error 'getUserStatsForGame data', data
         cb err
     else
       cb null, data
@@ -132,6 +176,7 @@ getUserId = (steam, name, cb) ->
   steam.resolveVanityURL {vanityurl: name}, (err, data) ->
     if err
       console.error 'getUserId error', err
+      console.error data
       cb err
     else
       if data.message == 'No match'
