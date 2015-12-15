@@ -48,7 +48,7 @@ module.exports = (robot) ->
             if err
               msg.send err
             else
-              msg.send userId ? "User not found"
+              msg.send String(userId) ? "User not found"
 
         robot.respond /steam stats (.*) (.*)/i, (msg) ->
           appName = msg.match[1]
