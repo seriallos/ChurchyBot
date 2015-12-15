@@ -65,7 +65,7 @@ module.exports = (robot) ->
           }, (err, results) ->
             name = results.player.personaname
             url = results.player.profileurl
-            avatar = results.player.avatar
+            avatar = results.player.avatarmedium
             level = results.level
 
             text = "#{name}, Level #{level}, #{url}"
@@ -76,8 +76,21 @@ module.exports = (robot) ->
                 color: '#345678'
                 title: name
                 title_link: url
-                text: 'this is a test'
+                text: "Level #{level}"
                 image_url: avatar
+                fields: [{
+                  title: 'Level'
+                  value: level
+                  short: true
+                }, {
+                  title: 'Last Online'
+                  value: results.player.lastlogoff
+                  short: true
+                }, {
+                  title: 'Created'
+                  value: results.player.timecreated
+                  short: true
+                }]
               }]
             }
 
