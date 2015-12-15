@@ -2,6 +2,7 @@
 #   DCSS Bot Stuff
 #
 # Commands:
+#   hubot steam player <username> - Show player summary (level, games owned, avatar)
 #   hubot steam achievements <game> <username> - Game stats for a user
 #   hubot steam userid <username> - Get user's Steam ID based on vanity URL
 #   hubot steam appid <game> - Get a game's AppId (loaded at startup)
