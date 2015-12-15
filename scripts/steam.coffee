@@ -34,6 +34,7 @@ module.exports = (robot) ->
             msg.send "Cannot find that game"
 
         robot.respond /steam userid (.*)/i, (msg) ->
+          console.log "Looking up userId for ", msg.match[1]
           getUserId steam, msg.match[1], (err, userId) ->
             if err
               msg.send err
