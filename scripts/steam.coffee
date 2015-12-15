@@ -71,7 +71,14 @@ module.exports = (robot) ->
             avatar = results.player.avatar
             level = results.level
 
-            msg.send "#{name}, Level #{level}, #{url}"
+            console.log JSON.stringify(msg, null, 2)
+
+            text = "#{name}, Level #{level}, #{url}"
+            robot.emit 'slack-attachment', {
+              icon_url: avatar
+              image_url: avatar
+              text: text
+            }
 
           )
 
