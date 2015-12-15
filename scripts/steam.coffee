@@ -52,16 +52,26 @@ module.exports = (robot) ->
             schema: (cb, results) ->
               steam.getSchemaForGame {appid: appId}, cb
             stats: ['userId', (cb, results) ->
-              steam.getUserStatsForGame {steamid: results.userId, appid: appId, version: 2}, cb
+              getUserStatsForGame steam, results.userId, appId, cb
             ]
           }, (err, results) ->
             if err
-              msg.send err
+              msg.send String(err)
             else
-              numGameCheevos = results.schema.game.availableGameStats.achievements.length
-              numUserCheevos = results.stats.playerstats.achievements.length
+              numGameCheevos = results?.schema?.game?.availableGameStats?.achievements?.length ? 0
+              numUserCheevos = results?.stats?.playerstats?.achievements?.length ? 0
               msg.send "Achievements: #{numUserCheevos} / #{numGameCheevos}"
           )
+
+getUserStatsForGame = (steam, userId, appId, cb) ->
+  steam.getUserStatsForGame {steamid: userId, appid: appId, version: 2}, (err, data) ->
+    if err
+      if err.message.match /HTTP 400/
+        cb null, null
+      else
+        cb err
+    else
+      cb null, data
 
 getUserId = (steam, name, cb) ->
   steam.resolveVanityURL {vanityurl: name}, (err, data) ->
