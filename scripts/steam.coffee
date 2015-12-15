@@ -66,39 +66,24 @@ module.exports = (robot) ->
               getOwnedGames steam, results.userId, null, cb
             ],
           }, (err, results) ->
+            {player, level, games} = results
 
-            console.log results
-
-            name = results.player.personaname
-            url = results.player.profileurl
-            avatar = results.player.avatarmedium
-            level = results.level
-
-            text = "#{name}, Level #{level}, #{url}"
             robot.emit 'slack-attachment', {
               channel: msg.envelope.room
               username: msg.robot.name
               attachments: [{
                 color: '#345678'
-                title: name
-                title_link: url
-                thumb_url: avatar
+                title: player.personaname
+                title_link: player.profileurl
+                thumb_url: player.avatarmedium
                 fields: [{
                   title: 'Level'
                   value: level
                   short: true
                 }, {
                   title: 'Games Owned'
-                  value: Object.keys(results.games).length
+                  value: Object.keys(games).length
                   short: true
-                #}, {
-                #  title: 'Last Online'
-                #  value: results.player.lastlogoff
-                #  short: true
-                #}, {
-                #  title: 'Created'
-                #  value: results.player.timecreated
-                #  short: true
                 }]
               }]
             }
