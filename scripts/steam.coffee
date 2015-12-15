@@ -12,7 +12,7 @@ _ = require 'lodash'
 
 
 if not process.env.STEAM_API_KEY
-  console.log "No STEAM_API_KEY env var defined, no Steam API for you"
+  console.error "No STEAM_API_KEY env var defined, no Steam API for you"
   return
 
 Steam.key = process.env.STEAM_API_KEY
@@ -61,17 +61,48 @@ module.exports = (robot) ->
               getSchemaForGame steam, appId, cb
             stats: ['userId', (cb, results) ->
               getUserStatsForGame steam, results.userId, appId, cb
-            ]
+            ],
+            playtime: ['userId', (cb, results) ->
+              getPlaytime steam, results.userId, appId, cb
+            ],
           }, (err, results) ->
             if err
               msg.send String(err)
+            else if results.playtime == null
+              msg.send "Game not owned"
             else
               numGameCheevos = results?.schema?.game?.availableGameStats?.achievements?.length ? 0
               numUserCheevos = results?.stats?.playerstats?.achievements?.length ? 0
-              msg.send "Achievements: #{numUserCheevos} / #{numGameCheevos}"
+
+              msg.send "Playtime: #{results.playtime}, Achievements: #{numUserCheevos} / #{numGameCheevos}"
           )
 
+getPlaytime = (steam, userId, appId, cb) ->
+  getOwnedGames steam, userId, appId, (err, owned) ->
+    if err
+      cb err
+    else
+      if not owned[appId]
+        cb null, null
+      else
+        minutesPlayed = owned[appId].playtime_forever
+        if minutesPlayed > 90
+          playtime = Math.round(minutesPlayed / 60) + " hours"
+        else
+          playtime = minutesPlayed + " minutes"
+        cb null, playtime
 
+getOwnedGames = (steam, userId, appId, cb) ->
+  opts =
+    steamid: userId
+    include_appinfo: true
+    include_played_free_games: true
+    appids_filter: null
+  steam.getOwnedGames opts, (err, data) ->
+    if err
+      cb err
+    else
+      cb null, _.indexBy(data.games, 'appid')
 
 getSchemaForGame = (steam, appId, cb) ->
   steam.getSchemaForGame {appid: appId}, (err, data) ->
@@ -84,7 +115,7 @@ getSchemaForGame = (steam, appId, cb) ->
       cb null, data
 
 getUserStatsForGame = (steam, userId, appId, cb) ->
-  steam.getUserStatsForGame {steamid: userId, appid: appId, version: 2}, (err, data) ->
+  steam.getUserStatsForGame {steamid: userId, appid: appId}, (err, data) ->
     if err
       if err.message.match /HTTP 400/
         # return empty stats
@@ -99,7 +130,10 @@ getUserId = (steam, name, cb) ->
     if err
       cb err
     else
-      cb null, data.steamid ? null
+      if data.message == 'No match'
+        cb Error("No such user")
+      else
+        cb null, data.steamid
 
 getGameId = (name) ->
   if appLookup[name.toLowerCase()]
