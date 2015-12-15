@@ -63,22 +63,23 @@ module.exports = (robot) ->
               getPlayerSummary steam, results.userId, cb
             ]
           }, (err, results) ->
-            console.log err
-            console.log results
-
             name = results.player.personaname
             url = results.player.profileurl
             avatar = results.player.avatar
             level = results.level
 
-            console.log msg
-
             text = "#{name}, Level #{level}, #{url}"
             robot.emit 'slack-attachment', {
               channel: msg.envelope.room
+              username: msg.robot.name
               icon_url: avatar
               image_url: avatar
               text: text
+              attachments: [{
+                color: '#345678'
+                title: 'Test'
+                text: 'this is a test'
+              }]
             }
 
           )
