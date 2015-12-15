@@ -25,10 +25,30 @@ module.exports = (robot) ->
             return obj.name.toLowerCase()
 
         robot.respond /steam appid (.*)/i, (msg) ->
-          game = msg.match[1]
+          game = getGameId(msg.match[1])
           console.log "Looking up AppID for ", game
-          if appLookup[game.toLowerCase()]
-            msg.send String(appLookup[game.toLowerCase()].appid)
+          gameId = getGameId game
+          if gameId
+            msg.send String(gameId)
           else
             msg.send "Cannot find that game"
 
+        robot.respond /steam userid (.*)/i, (msg) ->
+          getUserId steam, msg.match[1], (err, userId) ->
+            if err
+              msg.send err
+            else
+              msg.send userId ? "User not found"
+
+getUserId = (steam, name, cb) ->
+  steam.resolveVanityURL {vanityurl: name}, (err, data) ->
+    if err
+      cb err
+    else
+      cb null, data.steamid ? null
+
+getGameId = (name) ->
+  if appLookup[name.toLowerCase()]
+    return appLookup[name.toLowerCase()].appid
+  else
+    return null
