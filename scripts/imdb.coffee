@@ -19,18 +19,20 @@ module.exports = (robot) ->
     query = msg.match[3]
     msg.http("http://omdbapi.com/")
       .query({
-        t: query
+        t: query,
+        tomatoes: true
       })
       .get() (err, res, body) ->
         movie = JSON.parse(body)
         console.log movie
-        if movie
+        if not movie.Error
           robot.emit 'slack-attachment', {
             channel: msg.envelope.room
             username: msg.robot.name
             attachments: [{
               title: "#{movie.Title} (#{movie.Year})"
-              image_url: movie.Poster
+              title_url: "http://www.imdb.com/title/#{movie.imdbID}" if movie.imdbID else ''
+              icon_url: movie.Poster
               text: movie.Plot
               fields: [{
                 title: 'IMDB Rating'
