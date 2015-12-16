@@ -35,7 +35,7 @@ module.exports = (robot) ->
             attachments: [{
               title: "#{movie.Title} (#{movie.Year})"
               title_url: if movie.imdbID then "http://www.imdb.com/title/#{movie.imdbID}" else ''
-              icon_url: if OMDB_API_KEY then poster else ''
+              thumb_url: if OMDB_API_KEY then poster else ''
               text: movie.Plot
               fields: [{
                 title: 'TomatoMeter'
