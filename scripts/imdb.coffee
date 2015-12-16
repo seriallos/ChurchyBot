@@ -14,6 +14,8 @@
 # Author:
 #   orderedlist
 
+OMDB_API_KEY = process.env.OMDB_API_KEY
+
 module.exports = (robot) ->
   robot.respond /(imdb|movie)( me)? (.*)/i, (msg) ->
     query = msg.match[3]
@@ -25,6 +27,7 @@ module.exports = (robot) ->
       .get() (err, res, body) ->
         movie = JSON.parse(body)
         console.log movie
+        poster = "http://img.omdbapi.com/?i=#{movie.imdbID}&apikey=#{OMDB_API_KEY}"
         if not movie.Error
           robot.emit 'slack-attachment', {
             channel: msg.envelope.room
@@ -32,7 +35,7 @@ module.exports = (robot) ->
             attachments: [{
               title: "#{movie.Title} (#{movie.Year})"
               title_url: if movie.imdbID then "http://www.imdb.com/title/#{movie.imdbID}" else ''
-              icon_url: movie.Poster
+              icon_url: if OMDB_API_KEY then poster else ''
               text: movie.Plot
               fields: [{
                 title: 'TomatoMeter'
