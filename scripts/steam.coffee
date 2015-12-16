@@ -18,7 +18,7 @@ if not process.env.STEAM_API_KEY
 
 Steam.key = process.env.STEAM_API_KEY
 
-appLookup = {}
+apps = {}
 
 module.exports = (robot) ->
   Steam.ready (steamReadyErr) ->
@@ -31,18 +31,18 @@ module.exports = (robot) ->
 
       steam.getAppList {}, (appListErr, data) ->
         console.log "Got app list, num apps found: ", data.applist.apps.length
-        appLookup = _.indexBy data.applist.apps, (obj) ->
-          if obj.name
-            return obj.name.toLowerCase()
+        apps = data.applist.apps
 
         robot.respond /steam appid (.*)/i, (msg) ->
-          game = getGameId(msg.match[1])
-          console.log "Looking up AppID for ", game
-          gameId = getGameId game
-          if gameId
-            msg.send String(gameId)
-          else
+          name = msg.match[1]
+          console.log "Looking up AppID for ", name
+          gameIds = getGameIds name
+          if gameIds.length == 0
             msg.send "Cannot find that game"
+          else if gameIds.length == 1
+            msg.send String(gameIds[0])
+          else
+            msg.send "Multiple IDs found: #{gameIds.join ', '}"
 
         robot.respond /steam userid (.*)/i, (msg) ->
           console.log "Looking up userId for ", msg.match[1]
@@ -95,7 +95,18 @@ module.exports = (robot) ->
           appName = msg.match[1]
           userName = msg.match[2]
           console.log "Looking up stats for game ", appName, ", user ", userName
-          appId = getGameId(appName)
+          appIds = getGameIds(appName)
+
+          if appIds.length == 0
+            msg.send "Game not found"
+            return
+
+          if appIds.length > 1
+            msg.send "Multiple games found, try using a specific ID: #{appIds.join ', '}"
+            return
+
+          appId = appIds[0]
+
           async.auto({
             userId: (cb, results) -> getUserId(steam, userName, cb)
             schema: (cb, results) ->
@@ -198,11 +209,17 @@ getUserId = (steam, name, cb) ->
       if data.message == 'No match'
         cb Error("No such user")
       else
-        console.log data
         cb null, data.steamid
 
-getGameId = (name) ->
-  if appLookup[name.toLowerCase()]
-    return appLookup[name.toLowerCase()].appid
+getGameIds = (name) ->
+  filtered = _.filter(apps, (app) -> app.name.toLowerCase() == name.toLowerCase())
+  if filtered.length > 0
+    return _.map(filtered, (app) -> app.appid)
   else
-    return null
+    # try searching by appId instead of name
+    filtered = _.find(apps, 'appid', parseInt(name))
+    if filtered
+      return [ parseInt(name) ]
+    else
+      return []
+
