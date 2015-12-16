@@ -23,12 +23,30 @@ module.exports = (robot) ->
       })
       .get() (err, res, body) ->
         movie = JSON.parse(body)
+        console.log movie
         if movie
           text = "#{movie.Title} (#{movie.Year})\n"
           text += "IMDB: #{movie.imdbRating} MS: #{movie.Metascore}\n"
           text += "#{movie.Poster}\n" if movie.Poster
           text += "#{movie.Plot}"
 
-          msg.send text
+          robot.emit 'slack-attachment', {
+            channel: msg.envelope.room
+            username: msg.robot.name
+            attachments: [{
+              title: "#{movie.Title} (#{movie.Year})"
+              thumb_url: movie.Poster
+              text: movie.Plot
+              fields: [{
+                title: 'IMDB Rating'
+                value: movie.imdbRating
+                short: true
+              }, {
+                title: 'MetaCritic Score'
+                value: movie.Metascore
+                short: true
+              }]
+            }]
+          }
         else
-          msg.send "That's not a movie, yo."
+          msg.send "No movie found"
