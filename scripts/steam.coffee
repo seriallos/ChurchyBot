@@ -66,12 +66,21 @@ module.exports = (robot) ->
             games: ['userId', (cb, results) ->
               getOwnedGames steam, results.userId, null, cb
             ],
+            recent: ['userId', (cb, results) ->
+              getRecentlyPlayed steam, results.userId, cb
+            ],
           }, (err, results) ->
-            {player, level, games} = results
+            if err
+              msg.send "Error: #{err}"
+              return
+
+            {player, level, games, recent} = results
+            recentGames = _.map(recent.games, (r) -> r.name)
 
             robot.emit 'slack-attachment', {
               channel: msg.envelope.room
               username: msg.robot.name
+              text: "Recently played: #{recentGames.join ', '}"
               attachments: [{
                 color: '#345678'
                 title: player.personaname
@@ -132,6 +141,9 @@ module.exports = (robot) ->
 
               msg.send out.join(', ')
           )
+
+getRecentlyPlayed = (steam, userId, cb) ->
+  steam.getRecentlyPlayedGames {steamid: userId, count: 5}, cb
 
 getSteamLevel = (steam, userId, cb) ->
   steam.getSteamLevel {steamid: userId}, (err, data) ->
