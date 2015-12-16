@@ -80,12 +80,12 @@ module.exports = (robot) ->
             robot.emit 'slack-attachment', {
               channel: msg.envelope.room
               username: msg.robot.name
-              text: "Recently played: #{recentGames.join ', '}"
               attachments: [{
                 color: '#345678'
                 title: player.personaname
                 title_link: player.profileurl
                 thumb_url: player.avatarmedium
+                text: "Recently played: #{recentGames.join ', '}"
                 fields: [{
                   title: 'Level'
                   value: level
