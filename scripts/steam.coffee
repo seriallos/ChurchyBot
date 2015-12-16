@@ -75,7 +75,9 @@ module.exports = (robot) ->
               return
 
             {player, level, games, recent} = results
-            recentGames = _.map(recent.games, (r) -> r.name)
+            recentGames = _.map(recent.games, (r) ->
+              "#{r.name} (#{humanTime(r.playtime_2weeks)})"
+            )
 
             robot.emit 'slack-attachment', {
               channel: msg.envelope.room
@@ -142,6 +144,14 @@ module.exports = (robot) ->
               msg.send out.join(', ')
           )
 
+humanTime = (minutes) ->
+  if minutes > 90
+    hours = Math.round(minutes / 60)
+    playtime = "#{hours} hour#{if hours != 1 then 's' else ''}"
+  else
+    playtime = "#{minutes} minute#{if minutes != 1 then 's' else ''}"
+  return playtime
+
 getRecentlyPlayed = (steam, userId, cb) ->
   steam.getRecentlyPlayedGames {steamid: userId, count: 5}, cb
 
@@ -167,12 +177,7 @@ getPlaytime = (steam, userId, appId, cb) ->
       if not owned[appId]
         cb null, null
       else
-        minutesPlayed = owned[appId].playtime_forever
-        if minutesPlayed > 90
-          playtime = Math.round(minutesPlayed / 60) + " hours"
-        else
-          playtime = minutesPlayed + " minutes"
-        cb null, playtime
+        cb null, humanTime(owned[appId].playtime_forever)
 
 getOwnedGames = (steam, userId, appId, cb) ->
   opts =
