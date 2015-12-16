@@ -41,7 +41,7 @@ module.exports = (robot) ->
                 value: movie.tomatoMeter
                 short: true
               }, {
-                title: 'MetaCritic'
+                title: 'Metascore'
                 value: movie.Metascore
                 short: true
               }, {
