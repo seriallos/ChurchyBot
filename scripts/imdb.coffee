@@ -35,11 +35,11 @@ module.exports = (robot) ->
               icon_url: movie.Poster
               text: movie.Plot
               fields: [{
-                title: 'IMDB Rating'
-                value: movie.imdbRating
+                title: 'TomatoMeter'
+                value: movie.tomatoMeter
                 short: true
               }, {
-                title: 'MetaCritic Score'
+                title: 'MetaCritic'
                 value: movie.Metascore
                 short: true
               }, {
