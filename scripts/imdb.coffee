@@ -34,7 +34,7 @@ module.exports = (robot) ->
             username: msg.robot.name
             attachments: [{
               title: "#{movie.Title} (#{movie.Year})"
-              title_url: if movie.imdbID then "http://www.imdb.com/title/#{movie.imdbID}" else ''
+              title_link: if movie.imdbID then "http://www.imdb.com/title/#{movie.imdbID}" else ''
               thumb_url: if OMDB_API_KEY then poster else ''
               text: movie.Plot
               fields: [{
