@@ -25,17 +25,12 @@ module.exports = (robot) ->
         movie = JSON.parse(body)
         console.log movie
         if movie
-          text = "#{movie.Title} (#{movie.Year})\n"
-          text += "IMDB: #{movie.imdbRating} MS: #{movie.Metascore}\n"
-          text += "#{movie.Poster}\n" if movie.Poster
-          text += "#{movie.Plot}"
-
           robot.emit 'slack-attachment', {
             channel: msg.envelope.room
             username: msg.robot.name
             attachments: [{
               title: "#{movie.Title} (#{movie.Year})"
-              thumb_url: movie.Poster
+              image_url: movie.Poster
               text: movie.Plot
               fields: [{
                 title: 'IMDB Rating'
@@ -44,6 +39,14 @@ module.exports = (robot) ->
               }, {
                 title: 'MetaCritic Score'
                 value: movie.Metascore
+                short: true
+              }, {
+                title: 'Rated'
+                value: movie.Rated
+                short: true
+              }, {
+                title: 'Runtime'
+                value: movie.Runtime
                 short: true
               }]
             }]
