@@ -26,7 +26,6 @@ module.exports = (robot) ->
       })
       .get() (err, res, body) ->
         movie = JSON.parse(body)
-        console.log movie
         poster = "http://img.omdbapi.com/?i=#{movie.imdbID}&apikey=#{OMDB_API_KEY}"
         if not movie.Error
           robot.emit 'slack-attachment', {
