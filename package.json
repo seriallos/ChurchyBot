@@ -20,7 +20,7 @@
     "hubot-maps": "0.0.2",
     "hubot-markov": "^1.5.0",
     "hubot-outofcontext": "seriallos/hubot-outofcontext",
-    "hubot-plusplus": "^1.1.6",
+    "hubot-plusplus": "jwinget/hubot-plusplus",
     "hubot-pugme": "^0.1.0",
     "hubot-redis-brain": "0.0.3",
     "hubot-rules": "^0.1.1",
