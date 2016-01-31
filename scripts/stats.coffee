@@ -14,8 +14,12 @@
 
 REDIS_HOST = process.env.REDISCLOUD_URL
 
+Url = require 'url'
+
+redisUrl = Url.parse REDIS_HOST
+
 TimeSeries = require('redis-timeseries')
-redis = require('redis').createClient(REDIS_HOST)
+redis = require('redis').createClient(redisUrl.port, redisUrl.hostname)
 
 ts = new TimeSeries(redis, 'slackStats')
 
