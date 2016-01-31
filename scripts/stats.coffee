@@ -12,18 +12,24 @@
 # Author:
 #   sollaires
 
+Url = require 'url'
+TimeSeries = require('redis-timeseries')
+
 REDIS_HOST = process.env.REDISCLOUD_URL
 
-Url = require 'url'
-
-redisUrl = Url.parse REDIS_HOST
-
-TimeSeries = require('redis-timeseries')
-redis = require('redis').createClient(redisUrl.port, redisUrl.hostname)
-
-ts = new TimeSeries(redis, 'slackStats')
-
 module.exports = (robot) ->
+  redisUrl = Url.parse REDIS_HOST
+
+  redis = require('redis').createClient(redisUrl.port, redisUrl.hostname)
+  ts = new TimeSeries(redis, 'slackStats')
+
+  if redisUrl.auth
+    redis.auth redisUrl.auth.split(":")[1], (err) ->
+      if err
+        robot.logger.error "Failed to authenticate to Redis"
+      else
+        robot.logger.info "Successfully authenticated to Redis"
+
   redis.on 'ready', () ->
     console.log 'connected to time series redis'
 
