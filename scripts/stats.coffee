@@ -119,11 +119,13 @@ module.exports = (robot) ->
     robot.router.get '/hubot/stats/room', (req, res) ->
       console.log "GET /hubot/stats/room"
       redis.smembers 'rooms', (err, data) ->
+        res.set 'Access-Control-Allow-Origin', '*'
         res.send data
 
     robot.router.get '/hubot/stats/user', (req, res) ->
       console.log "GET /hubot/stats/user"
       redis.smembers 'users', (err, data) ->
+        res.set 'Access-Control-Allow-Origin', '*'
         res.send data
 
     robot.router.get '/hubot/stats/room/:room', (req, res) ->
@@ -133,6 +135,7 @@ module.exports = (robot) ->
         activity: (cb) -> ts.getHits "room:#{room}", '1hour', 24, cb
         users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
       }, (err, results) ->
+        res.set 'Access-Control-Allow-Origin', '*'
         res.send results
       )
 
@@ -143,6 +146,7 @@ module.exports = (robot) ->
         activity: (cb) -> ts.getHits "spoke:#{user}", '1hour', 24, cb
         rooms: (cb) -> redis.smembers "users:#{user}:roomsSpoken", cb
       }, (err, results) ->
+        res.set 'Access-Control-Allow-Origin', '*'
         res.send results
       )
 
@@ -151,5 +155,6 @@ module.exports = (robot) ->
       room = req.params.room
       console.log "GET /hubot/stats/user/#{user}/room/#{room}"
       ts.getHits "room:#{room}:#{user}", '1hour', 24, (err, results) ->
+        res.set 'Access-Control-Allow-Origin', '*'
         res.send results
 
