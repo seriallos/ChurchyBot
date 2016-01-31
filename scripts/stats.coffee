@@ -2,16 +2,23 @@
 #   Collect chat stats
 #
 # Dependencies:
-#   None
+#   lodash
+#   redis-timeseries
+#   redis
 #
 # Configuration:
 #   None
 #
 # Commands:
+#   stats for <user>
+#   stats for <user> in <room>
+#   stats for <user> in this room
+#   stats for this room
 #
 # Author:
 #   sollaires
 
+_ = require 'lodash'
 Url = require 'url'
 TimeSeries = require('redis-timeseries')
 
@@ -33,6 +40,7 @@ module.exports = (robot) ->
   redis.on 'ready', () ->
     console.log 'connected to time series redis'
 
+    # Record stats on chat
     robot.hear /(.*)/i, (msg) ->
       console.log msg.message
       username = msg.message.user.name
@@ -42,14 +50,30 @@ module.exports = (robot) ->
         .recordHit("room:#{room}:#{username}")
         .exec()
 
-      ts.getHits "spoke:#{username}", "1day", 1, (err, data) ->
-        if err
-          console.log err
-        console.log "user messages today"
+    # report stats on room
+    robot.respond '/stats for this room$/i', (msg) ->
+      room = msg.message.room
+      ts.getHits "room:#{msg.message.room}", '1day', 7, (err, data) ->
         console.log data
+        count = _.reduce(data,((sum, day) -> sum + day[1]), 0)
+        msg.send "#{count} messages in the last week in ##{room}"
 
-      ts.getHits "room:#{room}", "1day", 1, (err, data) ->
-        if err
-          console.log err
-        console.log "room messages today"
-        console.log data
+    # report stats on user with optional room
+    robot.respond '/stats for ([a-z0-9_-]+)( in ([a-z0-9-_]+))?$/i', (msg) ->
+      username = msg.match[1]
+      if username is 'me'
+        username = msg.message.user.name
+      if msg.match[2]
+        room = msg.match[3]
+        if room in ['this room', 'here', 'this channel']
+          room = msg.message.room
+        key =  "room:#{room}:#{username}"
+      else
+        key = "spoke:#{username}"
+
+      ts.getHits key, '1day', 7, (err, data) ->
+        count = _.reduce(data,((sum, day) -> sum + day[1]), 0)
+        out = "#{count} messages in the last week from #{username}"
+        if room
+          out += " in ##{room}"
+        msg.send out
