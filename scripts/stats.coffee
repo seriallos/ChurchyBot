@@ -3,6 +3,7 @@
 #
 # Dependencies:
 #   lodash
+#   async
 #   redis-timeseries
 #   redis
 #
@@ -14,11 +15,13 @@
 #   stats for <user> in <room>
 #   stats for <user> in this room
 #   stats for this room
+#   stats for #<room>
 #
 # Author:
 #   sollaires
 
 _ = require 'lodash'
+async = require 'async'
 Url = require 'url'
 TimeSeries = require('redis-timeseries')
 
@@ -44,17 +47,43 @@ module.exports = (robot) ->
     robot.hear /(.*)/i, (msg) ->
       username = msg.message.user.name
       room = msg.message.room
+      # track metrics
       ts.recordHit("spoke:#{username}")
         .recordHit("room:#{room}")
         .recordHit("room:#{room}:#{username}")
         .exec()
 
+      # add user to user set
+      redis.sadd 'users', username
+      redis.sadd "users:#{username}:roomsSpoken", room
+
+      # add room to room set
+      redis.sadd 'rooms', room
+      redis.sadd "rooms:#{room}:spoken", username
+
+
     # report stats on room
-    robot.respond '/stats for this room$/i', (msg) ->
-      room = msg.message.room
-      ts.getHits "room:#{msg.message.room}", '1day', 7, (err, data) ->
-        count = _.reduce(data,((sum, day) -> sum + day[1]), 0)
+    robot.respond '/stats for (this room|#([a-z0-9_-]+))$/i', (msg) ->
+      if msg.match[1] is 'this room'
+        room = msg.message.room
+      else
+        room = msg.match[2]
+
+      console.log "Looking up room stats for #{room}"
+      async.auto({
+        speakers: (cb) ->
+          redis.smembers("rooms:#{room}:spoken", cb)
+        roomTotal: (cb) ->
+          ts.getHits("room:#{msg.message.room}", '1day', 7, cb)
+        users: ['speakers', (cb, results) ->
+          console.log results.speakers
+          cb(null, null)
+        ]
+      }, (err, results) ->
+        console.log(results.speakers);
+        count = _.reduce(results.roomTotal, ((sum, day) -> sum + day[1]), 0)
         msg.send "#{count} messages in the last week in ##{room}"
+      )
 
     # report stats on user with optional room
     robot.respond '/stats for ([a-z0-9_-]+)( in ([a-z0-9-_]+))?$/i', (msg) ->
@@ -75,3 +104,4 @@ module.exports = (robot) ->
         if room
           out += " in ##{room}"
         msg.send out
+
