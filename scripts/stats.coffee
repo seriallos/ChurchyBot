@@ -61,7 +61,6 @@ module.exports = (robot) ->
       redis.sadd 'rooms', room
       redis.sadd "rooms:#{room}:spoken", username
 
-
     # report stats on room
     robot.respond '/stats for (this room|#([a-z0-9_-]+))$/i', (msg) ->
       if msg.match[1] is 'this room'
@@ -69,20 +68,31 @@ module.exports = (robot) ->
       else
         room = msg.match[2]
 
-      console.log "Looking up room stats for #{room}"
       async.auto({
         speakers: (cb) ->
           redis.smembers("rooms:#{room}:spoken", cb)
         roomTotal: (cb) ->
           ts.getHits("room:#{msg.message.room}", '1day', 7, cb)
         users: ['speakers', (cb, results) ->
-          console.log results.speakers
-          cb(null, null)
+          async.concat( results.speakers, (user, icb) ->
+            ts.getHits "room:#{room}:#{user}", '1day', 7, (err, data) ->
+              icb null, {user: user, data: data}
+          , cb
+          )
         ]
       }, (err, results) ->
-        console.log(results.speakers);
-        count = _.reduce(results.roomTotal, ((sum, day) -> sum + day[1]), 0)
-        msg.send "#{count} messages in the last week in ##{room}"
+        total = _.reduce(results.roomTotal, ((sum, day) -> sum + day[1]), 0)
+        userCounts = _.sortBy(_.map(results.users, (u) ->
+            {
+              user: u.user,
+              count: _.reduce(u.data, ((sum, day) -> sum + day[1]), 0)
+            }
+          )
+          , 'count'
+        ).reverse()
+        userMsgs = _.map(userCounts, (u) -> "• #{u.user}: #{u.count}")
+        userMsgs.unshift("#{total} messages in the last week in ##{room}")
+        msg.send userMsgs.join("\n")
       )
 
     # report stats on user with optional room
