@@ -11,9 +11,10 @@
 #   None
 #
 # Commands:
+#   stats for me
 #   stats for <user>
-#   stats for <user> in <room>
-#   stats for <user> in this room
+#   stats for <user> in #<room>
+#   stats for <user> in (here|this room|this channel)
 #   stats for this room
 #   stats for #<room>
 #
@@ -63,7 +64,7 @@ module.exports = (robot) ->
 
     # report stats on room
     robot.respond '/stats for (this room|#([a-z0-9_-]+))$/i', (msg) ->
-      if msg.match[1] is 'this room'
+      if msg.match[1] in ['this room', 'here', 'this channel']
         room = msg.message.room
       else
         room = msg.match[2]
@@ -96,7 +97,7 @@ module.exports = (robot) ->
       )
 
     # report stats on user with optional room
-    robot.respond '/stats for ([a-z0-9_-]+)( in ([a-z0-9-_]+))?$/i', (msg) ->
+    robot.respond '/stats for ([a-z0-9_-]+)( in #([a-z0-9-_]+))?$/i', (msg) ->
       username = msg.match[1]
       if username is 'me'
         username = msg.message.user.name
