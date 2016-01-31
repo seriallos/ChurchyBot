@@ -116,13 +116,40 @@ module.exports = (robot) ->
           out += " in ##{room}"
         msg.send out
 
-    robot.router.get '/hubot/stats/room/:room', (req, res) ->
-      console.log "GET /hubot/stats/room/#{req.params.room}"
-      ts.getHits "room:#{req.params.room}", '1hour', 24, (err, data) ->
+    robot.router.get '/hubot/stats/room', (req, res) ->
+      console.log "GET /hubot/stats/room"
+      redis.smembers 'rooms', (err, data) ->
         res.send data
 
-    robot.router.get '/hubot/stats/user/:user', (req, res) ->
-      console.log "GET /hubot/stats/user/#{req.params.user}"
-      ts.getHits "spoke:#{req.params.user}", '1hour', 24, (err, data) ->
+    robot.router.get '/hubot/stats/user', (req, res) ->
+      console.log "GET /hubot/stats/user"
+      redis.smembers 'users', (err, data) ->
         res.send data
+
+    robot.router.get '/hubot/stats/room/:room', (req, res) ->
+      room = req.params.room
+      console.log "GET /hubot/stats/room/#{room}"
+      async.auto({
+        activity: (cb) -> ts.getHits "room:#{room}", '1hour', 24, cb
+        users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
+      }, (err, results) ->
+        res.send results
+      )
+
+    robot.router.get '/hubot/stats/user/:user', (req, res) ->
+      user = req.params.user
+      console.log "GET /hubot/stats/user/#{user}"
+      async.auto({
+        activity: (cb) -> ts.getHits "spoke:#{user}", '1hour', 24, cb
+        rooms: (cb) -> redis.smembers "users:#{user}:roomsSpoken", cb
+      }, (err, results) ->
+        res.send results
+      )
+
+    robot.router.get '/hubot/stats/user/:user/room/:room', (req, res) ->
+      user = req.params.user
+      room = req.params.room
+      console.log "GET /hubot/stats/user/#{user}/room/#{room}"
+      ts.getHits "room:#{room}:#{user}", '1hour', 24, (err, results) ->
+        res.send results
 
