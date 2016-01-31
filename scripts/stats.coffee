@@ -42,7 +42,6 @@ module.exports = (robot) ->
 
     # Record stats on chat
     robot.hear /(.*)/i, (msg) ->
-      console.log msg.message
       username = msg.message.user.name
       room = msg.message.room
       ts.recordHit("spoke:#{username}")
@@ -54,7 +53,6 @@ module.exports = (robot) ->
     robot.respond '/stats for this room$/i', (msg) ->
       room = msg.message.room
       ts.getHits "room:#{msg.message.room}", '1day', 7, (err, data) ->
-        console.log data
         count = _.reduce(data,((sum, day) -> sum + day[1]), 0)
         msg.send "#{count} messages in the last week in ##{room}"
 
