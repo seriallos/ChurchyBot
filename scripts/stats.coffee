@@ -116,3 +116,13 @@ module.exports = (robot) ->
           out += " in ##{room}"
         msg.send out
 
+    robot.router.get '/hubot/stats/room/:room', (req, res) ->
+      console.log "GET /hubot/stats/room/#{req.params.room}"
+      ts.getHits "room:#{req.params.room}", '1hour', 24, (err, data) ->
+        res.send data
+
+    robot.router.get '/hubot/stats/user/:user', (req, res) ->
+      console.log "GET /hubot/stats/user/#{req.params.user}"
+      ts.getHits "spoke:#{req.params.user}", '1hour', 24, (err, data) ->
+        res.send data
+
