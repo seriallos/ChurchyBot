@@ -28,6 +28,14 @@ TimeSeries = require('redis-timeseries')
 
 REDIS_HOST = process.env.REDISCLOUD_URL
 
+roomsBlacklist = [
+    'Shell'
+]
+
+usersBlacklist = [
+    'Shell'
+]
+
 module.exports = (robot) ->
   redisUrl = Url.parse REDIS_HOST
 
@@ -43,6 +51,12 @@ module.exports = (robot) ->
 
   redis.on 'ready', () ->
     console.log 'connected to time series redis'
+
+    ##################################################################################
+    #
+    # Stat collector
+    #
+    ##################################################################################
 
     # Record stats on chat
     robot.hear /(.*)/i, (msg) ->
@@ -61,6 +75,12 @@ module.exports = (robot) ->
       # add room to room set
       redis.sadd 'rooms', room
       redis.sadd "rooms:#{room}:spoken", username
+
+    ##################################################################################
+    #
+    # Chat Responders
+    #
+    ##################################################################################
 
     # report stats on room
     robot.respond '/stats for (this room|#([a-z0-9_-]+))$/i', (msg) ->
@@ -116,17 +136,25 @@ module.exports = (robot) ->
           out += " in ##{room}"
         msg.send out
 
+    ##################################################################################
+    #
+    # HTTP Listeners
+    #
+    ##################################################################################
+
     robot.router.get '/hubot/stats/room', (req, res) ->
       console.log "GET /hubot/stats/room"
       redis.smembers 'rooms', (err, data) ->
-        res.set 'Access-Control-Allow-Origin', '*'
-        res.send data
+        redis.smembers 'users', (usersErr, usersData) ->
+            res.set 'Access-Control-Allow-Origin', '*'
+            # remove usernames and blacklisted rooms
+            res.send _.difference(_.difference(data, roomsBlacklist), usersData)
 
     robot.router.get '/hubot/stats/user', (req, res) ->
       console.log "GET /hubot/stats/user"
       redis.smembers 'users', (err, data) ->
         res.set 'Access-Control-Allow-Origin', '*'
-        res.send data
+        res.send _.difference(data, usersBlacklist)
 
     robot.router.get '/hubot/stats/room/:room', (req, res) ->
       room = req.params.room
