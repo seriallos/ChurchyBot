@@ -132,7 +132,7 @@ module.exports = (robot) ->
       room = req.params.room
       console.log "GET /hubot/stats/room/#{room}"
       async.auto({
-        activity: (cb) -> ts.getHits "room:#{room}", '1hour', 24, cb
+        activity: (cb) -> ts.getHits "room:#{room}", '1hour', 24 * 7, cb
         users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
@@ -143,7 +143,7 @@ module.exports = (robot) ->
       user = req.params.user
       console.log "GET /hubot/stats/user/#{user}"
       async.auto({
-        activity: (cb) -> ts.getHits "spoke:#{user}", '1hour', 24, cb
+        activity: (cb) -> ts.getHits "spoke:#{user}", '1hour', 24 * 7, cb
         rooms: (cb) -> redis.smembers "users:#{user}:roomsSpoken", cb
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
@@ -154,7 +154,7 @@ module.exports = (robot) ->
       user = req.params.user
       room = req.params.room
       console.log "GET /hubot/stats/user/#{user}/room/#{room}"
-      ts.getHits "room:#{room}:#{user}", '1hour', 24, (err, results) ->
+      ts.getHits "room:#{room}:#{user}", '1hour', 24 * 7, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
 
