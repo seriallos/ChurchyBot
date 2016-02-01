@@ -158,9 +158,11 @@ module.exports = (robot) ->
 
     robot.router.get '/hubot/stats/room/:room', (req, res) ->
       room = req.params.room
+      granularity = req.query.granularity ? '1hour'
+      count = req.query.count ? 24
       console.log "GET /hubot/stats/room/#{room}"
       async.auto({
-        activity: (cb) -> ts.getHits "room:#{room}", '1hour', 24 * 7, cb
+        activity: (cb) -> ts.getHits "room:#{room}", granularity, count, cb
         users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
@@ -169,9 +171,11 @@ module.exports = (robot) ->
 
     robot.router.get '/hubot/stats/user/:user', (req, res) ->
       user = req.params.user
+      granularity = req.query.granularity ? '1hour'
+      count = req.query.count ? 24
       console.log "GET /hubot/stats/user/#{user}"
       async.auto({
-        activity: (cb) -> ts.getHits "spoke:#{user}", '1hour', 24 * 7, cb
+        activity: (cb) -> ts.getHits "spoke:#{user}", granularity, count, cb
         rooms: (cb) -> redis.smembers "users:#{user}:roomsSpoken", cb
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
@@ -181,8 +185,10 @@ module.exports = (robot) ->
     robot.router.get '/hubot/stats/user/:user/room/:room', (req, res) ->
       user = req.params.user
       room = req.params.room
+      granularity = req.query.granularity ? '1hour'
+      count = req.query.count ? 24
       console.log "GET /hubot/stats/user/#{user}/room/#{room}"
-      ts.getHits "room:#{room}:#{user}", '1hour', 24 * 7, (err, results) ->
+      ts.getHits "room:#{room}:#{user}", granularity, count, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
 
