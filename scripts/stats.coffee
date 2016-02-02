@@ -13,10 +13,10 @@
 # Commands:
 #   stats for me
 #   stats for <user>
-#   stats for <user> in #<room>
+#   stats for <user> in <room>
 #   stats for <user> in (here|this room|this channel)
-#   stats for this room
-#   stats for #<room>
+#   room stats for this room
+#   room stats for <room>
 #
 # Author:
 #   sollaires
@@ -83,11 +83,11 @@ module.exports = (robot) ->
     ##################################################################################
 
     # report stats on room
-    robot.respond '/stats for (this room|#([a-z0-9_-]+))$/i', (msg) ->
+    robot.respond '/room stats for ([a-z0-9_-]+)$/i', (msg) ->
       if msg.match[1] in ['this room', 'here', 'this channel']
         room = msg.message.room
       else
-        room = msg.match[2]
+        room = msg.match[1]
 
       async.auto({
         speakers: (cb) ->
@@ -117,7 +117,7 @@ module.exports = (robot) ->
       )
 
     # report stats on user with optional room
-    robot.respond '/stats for ([a-z0-9_-]+)( in #([a-z0-9-_]+))?$/i', (msg) ->
+    robot.respond '/stats for ([a-z0-9_-]+)( in ([a-z0-9-_]+))?$/i', (msg) ->
       username = msg.match[1]
       if username is 'me'
         username = msg.message.user.name
