@@ -164,6 +164,9 @@ module.exports = (robot) ->
       async.auto({
         activity: (cb) -> ts.getHits "room:#{room}", granularity, count, cb
         users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
+        total: ['activity', (cb, results) ->
+          cb(null, _.reduce(results.activity, ((sum, chunk) -> sum + chunk[1]), 0))
+        ]
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
@@ -177,6 +180,9 @@ module.exports = (robot) ->
       async.auto({
         activity: (cb) -> ts.getHits "spoke:#{user}", granularity, count, cb
         rooms: (cb) -> redis.smembers "users:#{user}:roomsSpoken", cb
+        total: ['activity', (cb, results) ->
+          cb(null, _.reduce(results.activity, ((sum, chunk) -> sum + chunk[1]), 0))
+        ]
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
