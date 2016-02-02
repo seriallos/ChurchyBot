@@ -148,13 +148,13 @@ module.exports = (robot) ->
         redis.smembers 'users', (usersErr, usersData) ->
             res.set 'Access-Control-Allow-Origin', '*'
             # remove usernames and blacklisted rooms
-            res.send _.difference(_.difference(data, roomsBlacklist), usersData)
+            res.send _.sortBy(_.difference(_.difference(data, roomsBlacklist), usersData))
 
     robot.router.get '/hubot/stats/user', (req, res) ->
       console.log "GET /hubot/stats/user"
       redis.smembers 'users', (err, data) ->
         res.set 'Access-Control-Allow-Origin', '*'
-        res.send _.difference(data, usersBlacklist)
+        res.send _.sortBy(_.difference(data, usersBlacklist))
 
     robot.router.get '/hubot/stats/room/:room', (req, res) ->
       room = req.params.room
