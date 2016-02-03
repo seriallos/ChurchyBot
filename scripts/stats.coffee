@@ -62,6 +62,9 @@ module.exports = (robot) ->
     robot.hear /(.*)/i, (msg) ->
       username = msg.message.user.name
       room = msg.message.room
+
+      console.log message
+
       # track metrics
       ts.recordHit("spoke:#{username}")
         .recordHit("room:#{room}")
