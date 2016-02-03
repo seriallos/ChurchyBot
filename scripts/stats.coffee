@@ -84,7 +84,7 @@ module.exports = (robot) ->
       redis.sadd 'rooms', room
       redis.sadd "rooms:#{room}:spoken", username
 
-      urls = getUrls rawText
+      urls = getUrls msg.message.text
       console.log urls
 
     ##################################################################################
