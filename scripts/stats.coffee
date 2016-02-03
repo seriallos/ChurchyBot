@@ -6,6 +6,7 @@
 #   async
 #   redis-timeseries
 #   redis
+#   get-urls
 #
 # Configuration:
 #   None
@@ -25,6 +26,7 @@ _ = require 'lodash'
 async = require 'async'
 Url = require 'url'
 TimeSeries = require('redis-timeseries')
+getUrls = require 'get-urls'
 
 REDIS_HOST = process.env.REDISCLOUD_URL
 
@@ -62,8 +64,11 @@ module.exports = (robot) ->
     robot.hear /(.*)/i, (msg) ->
       username = msg.message.user.name
       room = msg.message.room
+      rawText = msg.message.rawText
+      isBot = msg.message.user?.slack?.is_bot
 
-      console.log msg.message
+      if isBot
+        return
 
       # track metrics
       ts.recordHit("spoke:#{username}")
@@ -78,6 +83,9 @@ module.exports = (robot) ->
       # add room to room set
       redis.sadd 'rooms', room
       redis.sadd "rooms:#{room}:spoken", username
+
+      urls = getUrls rawText
+      console.log urls
 
     ##################################################################################
     #
