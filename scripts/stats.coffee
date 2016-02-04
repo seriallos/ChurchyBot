@@ -22,6 +22,8 @@
 # Author:
 #   sollaires
 
+DEBUG = process.env.DEBUG
+
 _ = require 'lodash'
 async = require 'async'
 Url = require 'url'
@@ -66,31 +68,49 @@ module.exports = (robot) ->
     robot.hear /(.*)/i, (msg) ->
       username = msg.message.user.name
       room = msg.message.room
-      rawText = msg.message.rawText
+      text = msg.message.text
       isBot = msg.message.user?.slack?.is_bot
 
       # private message, ignore these
-      if username == room
+      if !DEBUG and (username == room)
         return
 
       if isBot
         return
 
-      # track metrics
-      ts.recordHit("spoke:#{username}")
-        .recordHit("room:#{room}")
-        .recordHit("room:#{room}:#{username}")
-        .exec()
+      # track who spoke in which room
+      if DEBUG
+        console.log "record time series"
+      else
+        now = Math.floor(Date.now() / 1000)
+        ts.recordHit("spoke:#{username}")
+          .recordHit("words:#{username}", now, text.split(/\s/).length
+          .recordHit("room:#{room}")
+          .recordHit("room:#{room}:#{username}")
+          .exec()
+
+      # track words
+      if DEBUG
+        console.log text.split /\s/
 
       # add user to user set
-      redis.sadd 'users', username
-      redis.sadd "users:#{username}:roomsSpoken", room
+      if DEBUG
+        console.log "SADD users,", username
+        console.log "SADD users#{username}:roomsSpoken,", username
+      else
+        redis.sadd 'users', username
+        redis.sadd "users:#{username}:roomsSpoken", room
 
       # add room to room set
-      redis.sadd 'rooms', room
-      redis.sadd "rooms:#{room}:spoken", username
+      if DEBUG
+        console.log "SADD to rooms,", room
+        console.log "SADD to rooms:#{room}:spoken,", room
+      else
+        redis.sadd 'rooms', room
+        redis.sadd "rooms:#{room}:spoken", username
 
-      urls = getUrls msg.message.text
+      # TODO: break this into smaller/reusable functions
+      urls = getUrls text
       urls.forEach (url) ->
         console.log "Detected '#{url}' in chat"
         fetch(url, {method: 'head'})
@@ -103,7 +123,10 @@ module.exports = (robot) ->
               room: room
             }
             if type.match /^image/
-              redis.lpush 'images', JSON.stringify(data)
+              if DEBUG
+                console.log "lpush to image:", data
+              else
+                redis.lpush 'images', JSON.stringify(data)
             else
               fetch(url)
                 .then (response) ->
@@ -114,7 +137,10 @@ module.exports = (robot) ->
                   twitterTitle = $('meta[name="twitter:title"]').attr('content')
                   facebookTitle = $('meta[name="og:title"]').attr('content')
                   data.title = facebookTitle || twitterTitle || pageTitle || null
-                  redis.lpush 'urls', JSON.stringify(data)
+                  if DEBUG
+                    console.log "lpush to url:", data
+                  else
+                    redis.lpush 'urls', JSON.stringify(data)
 
     ##################################################################################
     #
