@@ -86,8 +86,8 @@ module.exports = (robot) ->
 
       urls = getUrls msg.message.text
       urls.forEach (url) ->
+        console.log "Adding #{url} to urls list in redis"
         redis.lpush 'urls', url
-        redis.ltrim 'urls', 0, 100
 
     ##################################################################################
     #
