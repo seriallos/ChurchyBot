@@ -213,6 +213,6 @@ module.exports = (robot) ->
 
     robot.router.get '/hubot/stats/url', (req, res) ->
       console.log "GET /hubot/stats/url"
-      redis.lrange 'url', 0, 50, (err, urls) ->
+      redis.lrange 'urls', 0, 50, (err, urls) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send urls
