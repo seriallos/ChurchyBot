@@ -232,9 +232,9 @@ module.exports = (robot) ->
     robot.router.get '/hubot/stats/url', (req, res) ->
       redis.lrange 'urls', 0, 100, (err, urls) ->
         res.set 'Access-Control-Allow-Origin', '*'
-        res.send JSON.parse(urls)
+        res.send _.map(urls, JSON.parse)
 
     robot.router.get '/hubot/stats/image', (req, res) ->
       redis.lrange 'images', 0, 100, (err, images) ->
         res.set 'Access-Control-Allow-Origin', '*'
-        res.send JSON.parse(images)
+        res.send _.map(images, JSON.parse)
