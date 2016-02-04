@@ -85,7 +85,9 @@ module.exports = (robot) ->
       redis.sadd "rooms:#{room}:spoken", username
 
       urls = getUrls msg.message.text
-      console.log urls
+      urls.forEach (url) ->
+        redis.lpush 'urls', url
+        redis.ltrim 'urls', 0, 100
 
     ##################################################################################
     #
@@ -209,3 +211,8 @@ module.exports = (robot) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
 
+    robot.router.get '/hubot/stats/url', (req, res) ->
+      console.log "GET /hubot/stats/url"
+      redis.lrange 'url', 0, 50, (err, urls) ->
+        res.set 'Access-Control-Allow-Origin', '*'
+        res.send urls
