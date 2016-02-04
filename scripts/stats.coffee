@@ -84,7 +84,7 @@ module.exports = (robot) ->
       else
         now = Math.floor(Date.now() / 1000)
         ts.recordHit("spoke:#{username}")
-          .recordHit("words:#{username}", now, text.split(/\s/).length
+          .recordHit("words:#{username}", now, text.split(/\s/).length)
           .recordHit("room:#{room}")
           .recordHit("room:#{room}:#{username}")
           .exec()
