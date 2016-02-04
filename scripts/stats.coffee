@@ -28,6 +28,7 @@ Url = require 'url'
 TimeSeries = require('redis-timeseries')
 getUrls = require 'get-urls'
 fetch = require 'node-fetch'
+cheerio = require 'cheerio'
 
 REDIS_HOST = process.env.REDISCLOUD_URL
 
@@ -69,8 +70,8 @@ module.exports = (robot) ->
       isBot = msg.message.user?.slack?.is_bot
 
       # private message, ignore these
-      if username == room
-        return
+      #if username == room
+      #  return
 
       if isBot
         return
@@ -95,17 +96,25 @@ module.exports = (robot) ->
         fetch(url, {method: 'head'})
           .then (response) ->
             type = response.headers.get('content-type')
-            data = JSON.stringify({
+            data = {
               url: url
               who: username
               when: Math.floor(Date.now() / 1000)
               room: room
-            })
+            }
             if type.match /^image/
-              redis.lpush 'images', data
+              redis.lpush 'images', JSON.stringify(data)
             else
-              redis.lpush 'urls', data
-        #redis.lpush 'urls', url
+              fetch(url)
+                .then (response) ->
+                  return response.text()
+                .then (body) ->
+                  $ = cheerio.load body
+                  pageTitle = $('title').text()
+                  twitterTitle = $('meta[name="twitter:title"]').attr('content')
+                  facebookTitle = $('meta[name="og:title"]').attr('content')
+                  data.title = facebookTitle || twitterTitle || pageTitle || null
+                  redis.lpush 'urls', JSON.stringify(data)
 
     ##################################################################################
     #

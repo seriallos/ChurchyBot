@@ -6,6 +6,7 @@
   "description": "A simple helpful robot for your Company",
   "dependencies": {
     "async": "^1.5.0",
+    "cheerio": "^0.20.0",
     "get-urls": "^5.0.0",
     "hubot": "^2.16.0",
     "hubot-business-cat": "^1.2.5",
