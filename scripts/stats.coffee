@@ -27,6 +27,7 @@ async = require 'async'
 Url = require 'url'
 TimeSeries = require('redis-timeseries')
 getUrls = require 'get-urls'
+fetch = require 'node-fetch'
 
 REDIS_HOST = process.env.REDISCLOUD_URL
 
@@ -90,8 +91,21 @@ module.exports = (robot) ->
 
       urls = getUrls msg.message.text
       urls.forEach (url) ->
-        console.log "Adding #{url} to urls list in redis"
-        redis.lpush 'urls', url
+        console.log "Detected '#{url}' in chat"
+        fetch(url, {method: 'head'})
+          .then (response) ->
+            type = response.headers.get('content-type')
+            data = JSON.stringify({
+              url: url
+              who: username
+              when: Math.floor(Date.now() / 1000)
+              room: room
+            })
+            if type.match /^image/
+              redis.lpush 'images', data
+            else
+              redis.lpush 'urls', data
+        #redis.lpush 'urls', url
 
     ##################################################################################
     #
@@ -216,7 +230,11 @@ module.exports = (robot) ->
         res.send results
 
     robot.router.get '/hubot/stats/url', (req, res) ->
-      console.log "GET /hubot/stats/url"
-      redis.lrange 'urls', 0, 50, (err, urls) ->
+      redis.lrange 'urls', 0, 100, (err, urls) ->
         res.set 'Access-Control-Allow-Origin', '*'
-        res.send urls
+        res.send JSON.parse(urls)
+
+    robot.router.get '/hubot/stats/image', (req, res) ->
+      redis.lrange 'images', 0, 100, (err, images) ->
+        res.set 'Access-Control-Allow-Origin', '*'
+        res.send JSON.parse(images)
