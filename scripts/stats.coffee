@@ -70,8 +70,8 @@ module.exports = (robot) ->
       isBot = msg.message.user?.slack?.is_bot
 
       # private message, ignore these
-      #if username == room
-      #  return
+      if username == room
+        return
 
       if isBot
         return
