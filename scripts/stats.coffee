@@ -240,7 +240,6 @@ module.exports = (robot) ->
     ##################################################################################
 
     robot.router.get '/hubot/stats/room', (req, res) ->
-      console.log "GET /hubot/stats/room"
       redis.smembers 'rooms', (err, data) ->
         redis.smembers 'users', (usersErr, usersData) ->
             res.set 'Access-Control-Allow-Origin', '*'
@@ -248,7 +247,6 @@ module.exports = (robot) ->
             res.send _.sortBy(_.difference(_.difference(data, roomsBlacklist), usersData))
 
     robot.router.get '/hubot/stats/user', (req, res) ->
-      console.log "GET /hubot/stats/user"
       redis.smembers 'users', (err, data) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send _.sortBy(_.difference(data, usersBlacklist))
@@ -257,7 +255,6 @@ module.exports = (robot) ->
       room = req.params.room
       granularity = req.query.granularity ? '1hour'
       count = req.query.count ? 24
-      console.log "GET /hubot/stats/room/#{room}"
       async.auto({
         activity: (cb) -> ts.getHits "room:#{room}", granularity, count, cb
         users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
@@ -273,7 +270,6 @@ module.exports = (robot) ->
       user = req.params.user
       granularity = req.query.granularity ? '1hour'
       count = req.query.count ? 24
-      console.log "GET /hubot/stats/user/#{user}"
       async.auto({
         activity: (cb) -> ts.getHits "spoke:#{user}", granularity, count, cb
         rooms: (cb) -> redis.smembers "users:#{user}:roomsSpoken", cb
@@ -290,7 +286,6 @@ module.exports = (robot) ->
       room = req.params.room
       granularity = req.query.granularity ? '1hour'
       count = req.query.count ? 24
-      console.log "GET /hubot/stats/user/#{user}/room/#{room}"
       ts.getHits "room:#{room}:#{user}", granularity, count, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
