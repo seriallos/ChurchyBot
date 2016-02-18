@@ -23,6 +23,7 @@
 #   sollaires
 
 DEBUG = process.env.DEBUG
+TEAM_ID = process.env.SLACK_TEAM_ID
 
 _ = require 'lodash'
 async = require 'async'
@@ -41,6 +42,9 @@ roomsBlacklist = [
 usersBlacklist = [
     'Shell'
 ]
+
+clog = (args...) ->
+  console.log(args) if DEBUG
 
 module.exports = (robot) ->
   redisUrl = Url.parse REDIS_HOST
@@ -113,6 +117,7 @@ module.exports = (robot) ->
       urls = getUrls text
       urls.forEach (url) ->
         console.log "Detected '#{url}' in chat"
+        url = transformUrl(url)
         fetch(url, {method: 'head'})
           .then (response) ->
             type = response.headers.get('content-type')
@@ -122,7 +127,7 @@ module.exports = (robot) ->
               when: Math.floor(Date.now() / 1000)
               room: room
             }
-            if type.match /^image/
+            if isImage url, response
               if DEBUG
                 console.log "lpush to image:", data
               else
@@ -141,6 +146,32 @@ module.exports = (robot) ->
                     console.log "lpush to url:", data
                   else
                     redis.lpush 'urls', JSON.stringify(data)
+
+    transformUrl = (url) ->
+      if isSlackFile url
+        return getSlackImageLink url
+      return url
+
+    isImage = (url, response) ->
+      type = response.headers.get('content-type')
+      if type.match /^image/
+        return true
+      {pathname} = Url.parse(url)
+      if pathname.match /(jpe?g|gif|png)$/
+        return true
+      return false
+
+    slackFilePattern = new RegExp('slack\.com/files/([^/]+)/([^/]+)/([^/]+)', 'i')
+
+    isSlackFile = (url) ->
+      if url.match slackFilePattern
+        return true
+      else
+        return false
+
+    getSlackImageLink = (url) ->
+      matches = url.match slackFilePattern
+      return "https://files.slack.com/files-pri/#{TEAM_ID}-#{matches[2]}/#{matches[3]}"
 
     ##################################################################################
     #
