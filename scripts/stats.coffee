@@ -119,7 +119,7 @@ module.exports = (robot) ->
       urls.forEach (url) ->
         # slack wraps URLs in angle brackets, strip the last one (3 characters
         # encoded)
-        url = url.substr(0, -3)
+        url = url.substr(0, url.length - 3)
         console.log "Detected '#{url}' in chat"
         console.log text
         url = transformUrl(url)
