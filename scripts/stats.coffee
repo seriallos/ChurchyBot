@@ -119,8 +119,8 @@ module.exports = (robot) ->
       urls.forEach (url) ->
         # slack wraps URLs in angle brackets, strip the last one (3 characters
         # encoded)
-        console.log "Detected '#{url}' in chat"
         url = transformUrl(url)
+        console.log "Detected '#{url}' in chat"
         fetch(url, {method: 'head'})
           .then (response) ->
             type = response.headers.get('content-type')
