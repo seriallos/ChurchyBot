@@ -117,6 +117,7 @@ module.exports = (robot) ->
       urls = getUrls text
       urls.forEach (url) ->
         console.log "Detected '#{url}' in chat"
+        console.log text
         url = transformUrl(url)
         fetch(url, {method: 'head'})
           .then (response) ->
