@@ -72,7 +72,7 @@ module.exports = (robot) ->
     robot.hear /(.*)/i, (msg) ->
       username = msg.message.user.name
       room = msg.message.room
-      text = msg.message.rawText
+      text = msg.message.text
       isBot = msg.message.user?.slack?.is_bot
 
       # private message, ignore these
@@ -119,9 +119,7 @@ module.exports = (robot) ->
       urls.forEach (url) ->
         # slack wraps URLs in angle brackets, strip the last one (3 characters
         # encoded)
-        url = url.substr(0, url.length - 3)
         console.log "Detected '#{url}' in chat"
-        console.log text
         url = transformUrl(url)
         fetch(url, {method: 'head'})
           .then (response) ->
@@ -153,6 +151,9 @@ module.exports = (robot) ->
                     redis.lpush 'urls', JSON.stringify(data)
 
     transformUrl = (url) ->
+      # remove trailing paren from links.  it can happen
+      if url.endsWith(')')
+        url = url.substr(0, url.length - 1)
       if isSlackFile url
         return getSlackImageLink url
       return url
