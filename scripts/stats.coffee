@@ -72,7 +72,7 @@ module.exports = (robot) ->
     robot.hear /(.*)/i, (msg) ->
       username = msg.message.user.name
       room = msg.message.room
-      text = msg.message.text
+      text = msg.message.rawText
       isBot = msg.message.user?.slack?.is_bot
 
       # private message, ignore these
@@ -114,8 +114,12 @@ module.exports = (robot) ->
         redis.sadd "rooms:#{room}:spoken", username
 
       # TODO: break this into smaller/reusable functions
+      # seriallos uploaded a file: Slack for iOS Upload (https://sophististache.slack.com/files/seriallos/F0MSZJ2MU/slack_for_ios_upload.jpg)
       urls = getUrls text
       urls.forEach (url) ->
+        # slack wraps URLs in angle brackets, strip the last one (3 characters
+        # encoded)
+        url = url.substr(0, -3)
         console.log "Detected '#{url}' in chat"
         console.log text
         url = transformUrl(url)
