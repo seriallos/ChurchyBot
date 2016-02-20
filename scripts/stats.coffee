@@ -294,7 +294,7 @@ module.exports = (robot) ->
       count = req.query.count ? 24
       ts.getHits "room:#{room}:#{user}", granularity, count, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
-        res.send results
+        res.send {activity: results}
 
     robot.router.get '/hubot/stats/url', (req, res) ->
       redis.lrange 'urls', 0, 100, (err, urls) ->
