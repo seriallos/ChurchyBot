@@ -86,6 +86,7 @@ module.exports = (robot) ->
       if DEBUG
         console.log "record time series"
       else
+        # notify socket of new chat if timeout has elapsed
         now = Math.floor(Date.now() / 1000)
         ts.recordHit("spoke:#{username}")
           .recordHit("words:#{username}", now, text.split(/\s/).length)
@@ -114,7 +115,6 @@ module.exports = (robot) ->
         redis.sadd "rooms:#{room}:spoken", username
 
       # TODO: break this into smaller/reusable functions
-      # seriallos uploaded a file: Slack for iOS Upload (https://sophististache.slack.com/files/seriallos/F0MSZJ2MU/slack_for_ios_upload.jpg)
       urls = getUrls text
       urls.forEach (url) ->
         # slack wraps URLs in angle brackets, strip the last one (3 characters
@@ -135,6 +135,7 @@ module.exports = (robot) ->
                 console.log "lpush to image:", data
               else
                 redis.lpush 'images', JSON.stringify(data)
+                # notify socket of new image
             else
               fetch(url)
                 .then (response) ->
@@ -149,6 +150,7 @@ module.exports = (robot) ->
                     console.log "lpush to url:", data
                   else
                     redis.lpush 'urls', JSON.stringify(data)
+                    # notify socket of new url
 
     transformUrl = (url) ->
       # remove trailing paren from links.  it can happen
@@ -261,12 +263,22 @@ module.exports = (robot) ->
       room = req.params.room
       granularity = req.query.granularity ? '1hour'
       count = req.query.count ? 24
+      loadUsers = req.query.loadUsers ? false
       async.auto({
         activity: (cb) -> ts.getHits "room:#{room}", granularity, count, cb
         users: (cb) -> redis.smembers "rooms:#{room}:spoken", cb
         total: ['activity', (cb, results) ->
           cb(null, _.reduce(results.activity, ((sum, chunk) -> sum + chunk[1]), 0))
-        ]
+        ],
+        userData: ['users', (cb, results) ->
+          if !loadUsers
+            cb null, null
+          else
+            async.concat( results.users, (user, icb) ->
+              ts.getHits "room:#{room}:#{user}",granularity, count, (err, data) ->
+                icb null, {user: user, data: data}
+            , cb)
+        ],
       }, (err, results) ->
         res.set 'Access-Control-Allow-Origin', '*'
         res.send results
