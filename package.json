@@ -20,7 +20,6 @@
     "hubot-help": "^0.1.1",
     "hubot-heroku-keepalive": "^1.0.0",
     "hubot-maps": "0.0.2",
-    "hubot-markov": "^1.7.0",
     "hubot-outofcontext": "seriallos/hubot-outofcontext",
     "hubot-plusplus": "jwinget/hubot-plusplus",
     "hubot-pugme": "^0.1.0",
