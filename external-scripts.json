@@ -17,5 +17,6 @@
   "hubot-seriouslyguys",
   "hubot-dogeme",
   "hubot-outofcontext",
-  "hubot-sentimental"
+  "hubot-sentimental",
+  "hubot-markov"
 ]
