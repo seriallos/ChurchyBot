@@ -10,6 +10,7 @@
   "hubot-shipit",
   "hubot-youtube",
 
+  "hubot-markov",
   "hubot-plusplus",
   "hubot-thank-you",
   "hubot-fliptable",
@@ -17,6 +18,5 @@
   "hubot-seriouslyguys",
   "hubot-dogeme",
   "hubot-outofcontext",
-  "hubot-sentimental",
-  "hubot-markov"
+  "hubot-sentimental"
 ]
