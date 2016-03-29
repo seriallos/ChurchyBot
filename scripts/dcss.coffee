@@ -89,7 +89,7 @@ module.exports = (robot) ->
 
     ws.on 'open', ->
       console.log "Socket opened"
-      ws.send {msg: 'go_lobby'}
+      ws.send {'msg': 'go_lobby'}
 
     ws.on 'error', (error) ->
       console.error "WebSocket error: #{error}"
