@@ -41,7 +41,7 @@ USERS_TO_TRACK = [
 #  game_id: 'dcss-git',
 #  id: 122598 }
 
-host = 'crawl.akrasiac.org'
+host = 'crawl.berotato.org'
 rawData = "http://#{host}/rawdata"
 socketServer = "ws://#{host}:8080/socket"
 
