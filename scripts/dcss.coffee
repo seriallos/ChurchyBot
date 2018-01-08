@@ -21,7 +21,7 @@ deathLookupWaitSeconds = 30
 
 USERS_TO_TRACK = [
     'sollaires',
-    'drukna',
+    'bionic',
     'sieger',
     'apparentbliss',
     'octopanic',
