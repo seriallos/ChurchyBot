@@ -42,7 +42,7 @@ USERS_TO_TRACK = [
 #  id: 122598 }
 
 host = 'crawl.berotato.org'
-rawData = "http://#{host}/rawdata"
+rawData = "http://#{host}/crawl/morgue"
 socketServer = "ws://#{host}:8080/socket"
 
 sequellHost = 'https://loom.shalott.org/api/sequell'
