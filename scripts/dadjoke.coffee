@@ -1,17 +1,27 @@
+# Description:
+#   Retrieves random dad joke.
+#
+# Dependencies:
+#   None
+#
+# Configuration:
+#   None
+#
+# Commands:
+#   hubot dadjoke - Reply back with random dad joke.
+#
+# Author:
+#   jwinget
+
 module.exports = (robot) ->
-  robot.hear /dad joke/i, (msg) ->
-    robot.http("https://icanhazdadjoke.com")
-      .header('Accept', 'application/json')
-      .get() (err, response, body) ->
-        if response.getHeader('Content-Type') isnt 'application/json'
-          msg.send "Didn't get back JSON :("
-          return
-        data = null
-        try
-          data = JSON.parse(body)
-          return
-        catch error
-          msg.send "Ran into error parsing JSON :("
-          return
-        msg.send "ID-10T"
-        msg.send "#{data.joke}"
+	robot.respond /dadjoke$/i, (msg) ->
+		msg.http('https://icanhazdadjoke.com')
+            .header('Accept', 'application/json')
+            .get() (error, response, body) ->
+                # passes back the complete reponse
+                response = JSON.parse(body)
+                if response.success == "true"
+                	msg.send response.joke[0]
+                else
+                	msg.send "Unable to get dad jokes right now."
+                  
