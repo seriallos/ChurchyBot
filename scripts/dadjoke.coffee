@@ -6,4 +6,7 @@ module.exports = (robot) ->
         # error checking code here
 
         data = JSON.parse body
-        res.send "#{data.joke}
+        if not data.Error
+          res.send "#{data.joke}
+        else
+          res.send "error ID-10T"
