@@ -20,8 +20,8 @@ module.exports = (robot) ->
             .get() (error, response, body) ->
                 # passes back the complete reponse
                 response = JSON.parse(body)
-                if response.success == "true"
-                	msg.send response.joke[0]
+                if response.status == 200
+                	msg.send response.joke
                 else
                 	msg.send "Unable to get dad jokes right now."
                   
