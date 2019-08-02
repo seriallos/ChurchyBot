@@ -8,7 +8,7 @@ module.exports = (robot) ->
           return
         data = null
         try
-          data = JSON.parse body
+          data = JSON.parse(body)
           msg.send "Parsed JSON"
           msg.send "#{data.joke}"
           return
