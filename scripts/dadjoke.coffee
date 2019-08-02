@@ -1,6 +1,6 @@
 module.exports = (robot) ->
   robot.hear /dad joke/i, (msg) ->
-    msg.http("https://icanhazdadjoke.com")
+    robot.http("https://icanhazdadjoke.com")
       .header('Accept', 'application/json')
       .get() (err, response, body) ->
         if response.getHeader('Content-Type') isnt 'application/json'
@@ -9,9 +9,9 @@ module.exports = (robot) ->
         data = null
         try
           data = JSON.parse(body)
-          msg.send "Parsed JSON"
-          msg.send "#{data.joke}"
           return
         catch error
           msg.send "Ran into error parsing JSON :("
           return
+        msg.send "ID-10T"
+        msg.send "#{data.joke}"
