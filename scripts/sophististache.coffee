@@ -9,19 +9,15 @@ myfetish = [
 
 module.exports = (robot) ->
 
-# fry shocked
   robot.hear /shocked/i, (msg) ->
     msg.send "https://media.giphy.com/media/AaQYP9zh24UFi/giphy.gif"
     
-# fry not sure
   robot.hear /(fry not sure|not sure if)/i, (msg) ->
     msg.send "http://giphygifs.s3.amazonaws.com/media/ANbD1CCdA3iI8/giphy.gif"
     
-# tapping head
   robot.hear /tapping/i, (msg) ->
     msg.send "https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif"
     
-# wiping tears with money
   robot.hear /(money crying|wiping tears)/i, (msg) ->
     msg.send "http://giphygifs.s3.amazonaws.com/media/94EQmVHkveNck/giphy.gif"
     
@@ -31,5 +27,9 @@ module.exports = (robot) ->
   robot.hear /fillion (facepalm|confused)/i, (msg) ->
     msg.send "https://giphy.com/gifs/story-conversation-topic-vUEznRmVQfG2Q"
 
-  robot.hear /shut up and take my money/i, (msg) ->
+  robot.hear /take my money/i, (msg) ->
     msg.send "http://i.imgur.com/QlmfC.jpg"
+
+  robot.hear /wrong\./i, (msg) ->
+    msg.send "https://media.giphy.com/media/hPPx8yk3Bmqys/giphy.gif"
+    
