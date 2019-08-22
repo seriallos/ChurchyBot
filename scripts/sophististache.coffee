@@ -7,6 +7,16 @@ myfetish = [
   "http://giphygifs.s3.amazonaws.com/media/IPgIu0v6z77c4/giphy.gif"
 ]
 
+rimshots = [
+  "http://giphygifs.s3.amazonaws.com/media/SUeUCn53naadO/giphy.gif",
+  "http://giphygifs.s3.amazonaws.com/media/1gArwncRlXac8GIhNy8/giphy.gif",
+  "https://media.giphy.com/media/AR0MThYLSnmGQ/giphy.gif",
+  "http://giphygifs.s3.amazonaws.com/media/ItAmGFb0uiZz2/giphy.gif",
+  "https://media.giphy.com/media/fWgPzLGeI4okiaG8QT/giphy.gif",
+  "https://media.giphy.com/media/3oFzmhMIcKK846ku5i/giphy.gif",
+  "http://giphygifs.s3.amazonaws.com/media/gKYpJXuvVeryo/giphy.gif"
+]
+
 module.exports = (robot) ->
 
   robot.hear /shocked/i, (msg) ->
@@ -35,4 +45,7 @@ module.exports = (robot) ->
     
   robot.hear /what did you think/i, (msg) ->
     msg.send "https://media.giphy.com/media/YP6GvHrK2bo1q/giphy.gif"
+  
+  robot.hear /rimshot/i, (msg) ->
+    msg.send msg.random rimshots    
     
