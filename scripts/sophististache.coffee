@@ -33,3 +33,6 @@ module.exports = (robot) ->
   robot.hear /wrong\./i, (msg) ->
     msg.send "https://media.giphy.com/media/hPPx8yk3Bmqys/giphy.gif"
     
+  robot.hear /what did you think/i, (msg) ->
+    msg.send "https://media.giphy.com/media/YP6GvHrK2bo1q/giphy.gif"
+    
