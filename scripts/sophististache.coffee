@@ -49,3 +49,6 @@ module.exports = (robot) ->
   robot.hear /rimshot/i, (msg) ->
     msg.send msg.random rimshots    
     
+  robot.hear /(tv mount|mission accomplished|job well done)/i, (msg) ->
+    msg.send "https://i.imgur.com/ZidtWtL.jpg"
+    
