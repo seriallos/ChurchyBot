@@ -22,7 +22,7 @@ module.exports = (robot) ->
   robot.hear /shocked/i, (msg) ->
     msg.send "https://media.giphy.com/media/AaQYP9zh24UFi/giphy.gif"
     
-  robot.hear /(fry not sure|not sure if)/i, (msg) ->
+  robot.hear /(fry not sure|not sure if serious)/i, (msg) ->
     msg.send "http://giphygifs.s3.amazonaws.com/media/ANbD1CCdA3iI8/giphy.gif"
     
   robot.hear /tapping/i, (msg) ->
