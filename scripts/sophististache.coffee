@@ -41,7 +41,7 @@ module.exports = (robot) ->
     msg.send "http://i.imgur.com/QlmfC.jpg"
 
   robot.hear /wrong\./i, (msg) ->
-    msg.send "https://media.giphy.com/media/hPPx8yk3Bmqys/giphy.gif"
+    msg.send "https://giphy.com/gifs/ceeN6U57leAhi"
     
   robot.hear /what did you think/i, (msg) ->
     msg.send "https://media.giphy.com/media/YP6GvHrK2bo1q/giphy.gif"
