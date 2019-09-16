@@ -51,4 +51,7 @@ module.exports = (robot) ->
     
   robot.hear /(tv mount|mission accomplished|job well done)/i, (msg) ->
     msg.send "https://i.imgur.com/ZidtWtL.jpg"
+
+  robot.hear /ChurchyBot are you alive/i, (msg) ->
+    msg.send "https://giphy.com/gifs/game-of-thrones-got-arya-stark-9RKLlD2oz5c7m" 
     
