@@ -53,5 +53,8 @@ module.exports = (robot) ->
     msg.send "https://i.imgur.com/ZidtWtL.jpg"
 
   robot.hear /ChurchyBot are you alive/i, (msg) ->
-    msg.send "https://giphy.com/gifs/game-of-thrones-got-arya-stark-9RKLlD2oz5c7m" 
+    msg.send "https://giphy.com/gifs/game-of-thrones-got-arya-stark-9RKLlD2oz5c7m"
+
+  robot.hear /(Turbine|turbine)/i, (msg) ->
+    msg.send "POWERED BY OUR FANS" 
     
