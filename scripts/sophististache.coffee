@@ -34,7 +34,7 @@ module.exports = (robot) ->
   robot.hear /my fetish/i, (msg) ->
      msg.send msg.random myfetish    
     
-  robot.hear /fillion (facepalm|confused)/i, (msg) ->
+  robot.hear /(fillion|mal) (facepalm|confused|speechless)/i, (msg) ->
     msg.send "https://giphy.com/gifs/story-conversation-topic-vUEznRmVQfG2Q"
 
   robot.hear /take my money/i, (msg) ->
