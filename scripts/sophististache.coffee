@@ -19,7 +19,7 @@ rimshots = [
 
 module.exports = (robot) ->
 
-  robot.hear /shocked/i, (msg) ->
+  robot.hear /shocked$/i, (msg) ->
     msg.send "https://media.giphy.com/media/AaQYP9zh24UFi/giphy.gif"
     
   robot.hear /(fry not sure|^not sure if)/i, (msg) ->
@@ -58,3 +58,5 @@ module.exports = (robot) ->
   robot.hear /(Turbine|turbine)/i, (msg) ->
     msg.send "POWERED BY OUR FANS" 
     
+  robot.hear /so say we all/i, (msg) ->
+    msg.send "https://media.giphy.com/media/NM4E1FcXQK6oE/giphy.gif"
