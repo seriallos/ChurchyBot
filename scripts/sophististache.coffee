@@ -62,5 +62,5 @@ module.exports = (robot) ->
     msg.send "https://media.giphy.com/media/NM4E1FcXQK6oE/giphy.gif"
     
   robot.hear /YACHTS/, (msg) ->
-    msg.send "https://sophististache.slack.com/files/U0BJVRGNS/FH2BMAFR8/yachts.jpg"
+    msg.send "https://i.imgur.com/Cln9dqs.png"
   
